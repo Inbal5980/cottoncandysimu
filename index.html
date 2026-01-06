@@ -145,7 +145,7 @@
             flex-wrap: wrap;
             justify-content: center;
             align-content: flex-start;
-            gap: 5px;
+            gap: 10px;
             min-height: 120px;
             width: 100%;
             padding: 10px;
@@ -153,12 +153,51 @@
             border-radius: 15px;
             margin-top: 10px;
         }
+
+        /* עיצוב קבוצות של 10 */
+        .ten-group {
+            border: 2px dashed #FFB6D9;
+            background-color: rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            padding: 5px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 2px;
+            width: 110px; /* רוחב שמתאים לכ-5 עננים בשורה */
+            position: relative;
+        }
         
+        /* תווית קטנה לקבוצה */
+        .ten-group::after {
+            content: '10';
+            position: absolute;
+            bottom: -8px;
+            right: -8px;
+            font-size: 0.7rem;
+            background: #FFB6D9;
+            color: white;
+            padding: 2px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+            opacity: 0; /* מוסתר כברירת מחדל, מוצג רק אם מלא */
+        }
+
+        .ten-group.full::after {
+            opacity: 1;
+        }
+
         .cloud {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             animation: float 3s ease-in-out infinite;
             user-select: none;
             transition: all 0.3s;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
         @keyframes float {
@@ -207,7 +246,7 @@
             margin: 20px 0;
             flex-wrap: wrap;
             font-size: 1.5rem;
-            direction: ltr;
+            direction: ltr; /* כיוון מתמטי נכון */
         }
         
         .number-box {
@@ -345,7 +384,8 @@
             <h1>🍭 חֲדַר צֶמֶר הַגֶּפֶן הַמָּתוֹק 🍭</h1>
             <p class="story">
                 בַּחֲדַר צֶמֶר הַגֶּפֶן הַמָּתוֹק יֵשׁ מִסְפַּר מְכוֹנוֹת שֶׁמְּכִינוֹת אֶת צֶמֶר הַגֶּפֶן הַמָּתוֹק.<br>
-                הַמְּכוֹנָה הַיְּמָנִית יִצְּרָה <strong>23</strong> עַנְנֵי צֶמֶר גֶּפֶן מָתוֹק - <strong>5 יוֹתֵר</strong> מִמִּסְפַּר הָעֲנָנִים שֶׁיִּצְּרָה הַמְּכוֹנָה הַשְּׂמָאלִית.
+                הַמְּכוֹנָה הַיְּמָנִית יִצְּרָה <strong>23</strong> עַנְנֵי צֶמֶר גֶּפֶן מָתוֹק.<br>
+                זֶה <strong>5 יוֹתֵר</strong> מִמִּסְפַּר הָעֲנָנִים שֶׁיִּצְּרָה הַמְּכוֹנָה הַשְּׂמָאלִית.
             </p>
         </div>
         
@@ -407,21 +447,38 @@
     </div>
     
     <script>
-        // יצירת ענני צמר גפן למכונה ימנית
+        // יצירת ענני צמר גפן בקבוצות של 10
         function createClouds(containerId, count) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
-            for (let i = 0; i < count; i++) {
-                const cloud = document.createElement('div');
-                cloud.className = 'cloud';
-                cloud.textContent = '☁️';
-                cloud.style.animationDelay = `${Math.random() * 2}s`;
-                container.appendChild(cloud);
+            
+            let cloudsRemaining = count;
+            
+            // לולאה ליצירת קבוצות
+            while (cloudsRemaining > 0) {
+                const groupSize = Math.min(10, cloudsRemaining);
+                const groupDiv = document.createElement('div');
+                groupDiv.className = 'ten-group';
+                if (groupSize === 10) groupDiv.classList.add('full');
+                
+                // יצירת עננים בתוך הקבוצה
+                for (let i = 0; i < groupSize; i++) {
+                    const cloud = document.createElement('div');
+                    cloud.className = 'cloud';
+                    cloud.textContent = '☁️';
+                    cloud.style.animationDelay = `${Math.random() * 2}s`;
+                    groupDiv.appendChild(cloud);
+                }
+                
+                container.appendChild(groupDiv);
+                cloudsRemaining -= groupSize;
+            }
+
+            // אם אין עננים בכלל (0), ננקה הכל
+            if (count === 0) {
+                container.innerHTML = '';
             }
         }
-        
-        // אתחול מכונה ימנית
-        createClouds('rightClouds', 23);
         
         const correctLeftAmount = 18;
         
@@ -498,7 +555,7 @@
             // בדיקת שלב א'
             if (isNaN(leftAnswer) || leftAnswer !== correctLeftAmount) {
                 feedback.className = 'feedback incorrect';
-                feedback.innerHTML = '😊 תַּחְשְׁבוּ שׁוּב עַל הַמְּכוֹנָה הַשְּׂמָאלִית:<br>הַמְּכוֹנָה הַיְּמָנִית יִצְּרָה 23 עֲנָנִים, שֶׁזֶּה 5 <strong>יוֹתֵר</strong> מֵהַמְּכוֹנָה הַשְּׂמָאלִית.<br>נַסּוּ לְהִשְׁתַּמֵּשׁ בְּכַפְתּוֹרֵי הַפְּלוּס וְהַמִּינוּס כְּדֵי לְהַגִּיעַ לַתְּשׁוּבָה! 🤔';
+                feedback.innerHTML = '😊 הִתְחַלְנוּ עִם 23 עֲנָנִים.<br>הַשְׁתַּמְּשׁוּ בְּכַפְתּוֹר הַמִּינוּס (➖) כְּדֵי לְהוֹרִיד 5 עֲנָנִים עַד שֶׁתַּגִּיעוּ לַתְּשׁוּבָה! 🤔';
                 return;
             }
             
@@ -547,6 +604,14 @@
                 emoji.remove();
             }, 4000);
         }
+
+        // אתחול מכונות - ימין ושמאל מתחילות ב-23
+        createClouds('rightClouds', 23);
+        
+        // אתחול מכונה שמאלית ב-23 ועדכון האינפוט
+        document.getElementById('leftAnswer').value = 23;
+        updateGameState(23);
+
     </script>
 </body>
 </html>
